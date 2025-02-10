@@ -4,7 +4,7 @@ This repository contains the implementation of a research work currently under d
 In order to preserve anonymity, any references to authors, affiliations, or specific publication details have been removed.
 
 ## Overview
-- This code uses **dynamic clustering**, a **Adaptive Output Aggregation Using Gating Mechanism**, and a **statistic-aware loss** for our experiments.
+- This code uses **Dynamic Clustering**, a **Adaptive Output Aggregation Using Gating Mechanism**, and a **Statistic-aware Loss** for our experiments.
 - Further details about the methodology and experiments can be found in the manuscript (not provided here for anonymity).
 
 ## Dataset
