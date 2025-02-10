@@ -9,7 +9,3 @@ In order to preserve anonymity, any references to authors, affiliations, or spec
 
 ## Dataset
 The NASDAQ and NYSE datasets used in this project can be obtained from [data](https://github.com/fulifeng/Temporal_Relational_Stock_Ranking/tree/master/data).
-
-## Requirements
-- **Python 3.x** or higher
-- (Optional) If you have additional dependencies, include them in a `requirements.txt` file or specify them here.
