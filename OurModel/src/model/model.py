@@ -55,7 +55,7 @@ class model(nn.Module):
     Main model architecture combining three key components:
     1. Stock Encoding
     2. Dynamic Stock Clustering
-    3. Gating Mechanism
+    3. Adaptive Output Aggregation Using Gating Mechanism
     """
     def __init__(self, stock_num, lookback_length, fea_num, market_num, n_clusters, n_subclusters, hidden_dim):
         super().__init__()
@@ -101,7 +101,7 @@ class model(nn.Module):
             nn.Linear(hidden_dim, 1)
         )
 
-        # Gating mechanism
+        # Adaptive Output Aggregation Using Gating Mechanism
         # Generates α_i to combine local and cluster-based predictions
         self.gate_network = nn.Sequential(
             nn.Linear(2 * hidden_dim, 1),
@@ -119,7 +119,7 @@ class model(nn.Module):
         Forward pass of the model:
         1. Get representations from stock encoding
         2. Perform dynamic stock clustering
-        3. Generate and combine predictions using gate mechanism
+        3. Generate and combine predictions using Adaptive Output Aggregation
         """
         # Get encoded representations
         _, encoding_reps, market_reps, stock_reps = self.stock_encoding(data_batch)
