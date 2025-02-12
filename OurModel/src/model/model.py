@@ -68,25 +68,17 @@ class model(nn.Module):
        1. Get representations from stock encoding
        2. Perform dynamic stock clustering
        3. Generate and combine predictions using Adaptive Output Aggregation
+
+        data_batch: Tensor[batch_size(1), stock_num, lookback_length, fea_num]
     
-       Args:
-           data_batch: Tensor[batch_size(1), stock_num, lookback_length, fea_num]
-    
-       Returns:
-           final_prediction: Tensor[stock_num, 1] - Final predicted values
-           cluster_indices: Tensor[stock_num] - Cluster assignment for each stock
-           market_stock_similarities: Tensor[stock_num] - Similarity scores between stocks and market
-           gate: Tensor[stock_num, 1] - Gating values for each stock
        """
+        
        # Get encoded representations
        _, encoding_reps, market_reps, stock_reps = self.stock_encoding(data_batch)
        
        # Get clustering-based representations
-       # Input: stock_reps: Tensor[stock_num, hidden_dim]
-       #        market_reps: Tensor[market_num, hidden_dim]
-       # Output: clustering_reps: Tensor[stock_num, hidden_dim]
-       #         cluster_indices: Tensor[stock_num]
-       #         market_stock_similarities: Tensor[stock_num]
+       # stock_reps: Tensor[stock_num, hidden_dim]
+       # market_reps: Tensor[market_num, hidden_dim]
        clustering_reps, cluster_indices, market_stock_similarities = self.stock_clustering(stock_reps, market_reps)
     
        # Generate local and cluster-based predictions
