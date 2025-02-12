@@ -115,27 +115,49 @@ class model(nn.Module):
         self.ic_weight = nn.Parameter(torch.tensor(0.05, requires_grad=True))
 
     def forward(self, data_batch):
-        """
-        Forward pass of the model:
-        1. Get representations from stock encoding
-        2. Perform dynamic stock clustering
-        3. Generate and combine predictions using Adaptive Output Aggregation
-        """
-        # Get encoded representations
-        _, encoding_reps, market_reps, stock_reps = self.stock_encoding(data_batch)
-        
-        # Get clustering-based representations
-        clustering_reps, cluster_indices, market_stock_similarities = self.stock_clustering(stock_reps, market_reps)
-
-        # Generate local and cluster-based predictions
-        o_local = self.encoding_mlp(encoding_reps)      # ĉ^l_i in paper
-        o_cluster = self.clustering_mlp(clustering_reps) # ĉ^c_i in paper
-
-        # Compute gating parameter α_i
-        gate_input = torch.cat([encoding_reps, clustering_reps], dim=-1)
-        gate = self.gate_network(gate_input)
-        
-        # Final prediction: α_i * ĉ^l_i + (1-α_i) * ĉ^c_i
-        final_prediction = gate * o_local + (1 - gate) * o_cluster
-        
-        return final_prediction, cluster_indices, market_stock_similarities, gate
+       """
+       Forward pass of the model:
+       1. Get representations from stock encoding
+       2. Perform dynamic stock clustering
+       3. Generate and combine predictions using Adaptive Output Aggregation
+    
+       Args:
+           data_batch: Tensor[batch_size(1), stock_num, lookback_length, fea_num]
+    
+       Returns:
+           final_prediction: Tensor[stock_num, 1] - Final predicted values
+           cluster_indices: Tensor[stock_num] - Cluster assignment for each stock
+           market_stock_similarities: Tensor[stock_num] - Similarity scores between stocks and market
+           gate: Tensor[stock_num, 1] - Gating values for each stock
+       """
+       # Get encoded representations
+       _, encoding_reps, market_reps, stock_reps = self.stock_encoding(data_batch)
+       
+       # Get clustering-based representations
+       # Input: stock_reps: Tensor[stock_num, hidden_dim]
+       #        market_reps: Tensor[market_num, hidden_dim]
+       # Output: clustering_reps: Tensor[stock_num, hidden_dim]
+       #         cluster_indices: Tensor[stock_num]
+       #         market_stock_similarities: Tensor[stock_num]
+       clustering_reps, cluster_indices, market_stock_similarities = self.stock_clustering(stock_reps, market_reps)
+    
+       # Generate local and cluster-based predictions
+       # Input: encoding_reps: Tensor[stock_num, hidden_dim]
+       # Output: o_local: Tensor[stock_num, 1]
+       o_local = self.encoding_mlp(encoding_reps)      # ĉ^l_i in paper
+    
+       # Input: clustering_reps: Tensor[stock_num, hidden_dim]
+       # Output: o_cluster: Tensor[stock_num, 1]
+       o_cluster = self.clustering_mlp(clustering_reps) # ĉ^c_i in paper
+    
+       # Compute gating parameter α_i
+       # Input: concatenated: Tensor[stock_num, 2*hidden_dim]
+       # Output: gate: Tensor[stock_num, 1]
+       gate_input = torch.cat([encoding_reps, clustering_reps], dim=-1)
+       gate = self.gate_network(gate_input)
+       
+       # Final prediction: α_i * ĉ^l_i + (1-α_i) * ĉ^c_i
+       # All inputs and output: Tensor[stock_num, 1]
+       final_prediction = gate * o_local + (1 - gate) * o_cluster
+       
+       return final_prediction, cluster_indices, market_stock_similarities, gate
